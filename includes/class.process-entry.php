@@ -70,7 +70,7 @@ class ideaFactoryProcessEntry {
 
 					// create an ideas post type
 					$post_args = array(
-					  	'post_title'    => wp_strip_all_tags( $cat .' '. $categoryID .' '. $tmp_category_name .' '. $title),
+					  	'post_title'    => wp_strip_all_tags( $title),
 					  	'post_content'  => idea_factory_media_filter( $desc ),
 					  	'post_status'   => $must_approve,
 					  	'post_type'	  	=> 'ideas',
