@@ -22,15 +22,17 @@ class ideaFactoryShortcodes {
 		$defaults = array(
 			'hide_submit'	=> 'off',
 			'hide_voting'	=> 'off',
-			'hide_votes'	=> 'off'
+			'hide_votes'	=> 'off',
+			'idea_category' => ''
 		);
 		$atts = shortcode_atts( $defaults, $atts );
 
 		$postid = get_the_ID();
 
-		$show_submit  = 'on' !== $atts['hide_submit'];
-		$show_voting  = 'on' !== $atts['hide_voting'];
-		$show_votes   = 'on' !== $atts['hide_votes'];
+		$show_submit   = 'on' !== $atts['hide_submit'];
+		$show_voting   = 'on' !== $atts['hide_voting'];
+		$show_votes    = 'on' !== $atts['hide_votes'];
+		$idea_category = $atts['idea_category'];
 
 		ob_start();
 
@@ -41,9 +43,21 @@ class ideaFactoryShortcodes {
 			do_action('idea_factory_sc_layout_before_entries', $postid);
 
 			if ( $show_submit ) { echo idea_factory_submit_header(); } ?>
-
+			
 			<section class="idea-factory--layout-main">
 				<?php
+
+				$categoryID = null;
+				
+				$args = array('hide_empty' => false);
+				$categories = get_categories($args);
+
+				foreach($categories as $category) {
+					if ($category->name == $idea_category) {
+						$categoryID = $category->cat_ID;
+						break;
+					}
+				}
 
 				$paged = get_query_var('paged') ? get_query_var('paged') : 1;
 
@@ -51,8 +65,10 @@ class ideaFactoryShortcodes {
 					'post_type'			=> 'ideas',
 					'meta_key'			=> '_idea_votes',
 					'orderby'			=> 'meta_value_num',
-					'paged'				=> $paged
+					'paged'				=> $paged,
+					'cat'     			=> array($categoryID)
 				);
+				
 				$q = new WP_Query( apply_filters('idea_factory_query_args', $args ) );
 
 				$max = $q->max_num_pages;
@@ -68,7 +84,7 @@ class ideaFactoryShortcodes {
 
 						if ( is_user_logged_in() ) {
 
-							$has_voted 		= get_user_meta( get_current_user_ID(), '_idea'.$id.'_has_voted', true);
+							$has_voted 		= get_user_meta( get_current_user_ID(), '_idea'.$id.'_'.$idea_category.'_has_voted', true);
 
 						} elseif( $public_can_vote ) {
 
@@ -153,7 +169,7 @@ class ideaFactoryShortcodes {
 
 		</div>
 
-		<?php if ( $show_submit ) { echo idea_factory_submit_modal(); }
+		<?php if ( $show_submit ) { echo idea_factory_submit_modal($idea_category); }
 
 		do_action('idea_factory_sc_layout_after', $postid);
 

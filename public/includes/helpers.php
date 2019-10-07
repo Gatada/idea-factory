@@ -346,7 +346,7 @@ function idea_factory_localized_args( $max = '', $paged = '' ){
 */
 if ( !function_exists('idea_factory_submit_modal') ):
 
-	function idea_factory_submit_modal(){
+	function idea_factory_submit_modal($category) {
 
 		$public_can_vote = idea_factory_get_option('if_public_voting','if_settings_main');
 
@@ -379,6 +379,7 @@ if ( !function_exists('idea_factory_submit_modal') ):
 
 								<input type="hidden" name="action" value="process_entry">
 								<input type="hidden" name="nonce" value="<?php echo wp_create_nonce('if-entry-nonce'); ?>"/>
+								<input type="hidden" name="idea_category" value="<?php echo $category; ?>"/>
 
 								<div class="idea-factory-modal-footer">
 									<input class="idea-factory--button" type="submit" value="<?php apply_filters('idea_factory_submit_label', _e('Submit','idea-factory'));?>">

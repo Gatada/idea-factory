@@ -25,6 +25,21 @@ class ideaFactoryProcessEntry {
 
 		$title 			= isset( $_POST['idea-title'] ) ? $_POST['idea-title'] : null;
 		$desc 			= isset( $_POST['idea-description'] ) ? $_POST['idea-description'] : null;
+		$cat		    = isset( $_POST['idea_category'] ) ? $_POST['idea_category'] : null;
+
+		$categoryID = null;
+		$tmp_category_name = null;
+		
+		$args = array('hide_empty' => false);
+		$categories = get_categories($args);
+		
+		foreach($categories as $category) {
+			if ($category->name == $cat) {
+				$categoryID = $category->cat_ID;
+				$tmp_category_name = $category->name;
+				break;
+			}
+		}
 
 		$must_approve 	= 'on' == idea_factory_get_option('if_approve_ideas','if_settings_main') ? 'pending' : 'publish';
 
@@ -36,8 +51,8 @@ class ideaFactoryProcessEntry {
 
 			// ok security passes so let's process some data
 			if ( wp_verify_nonce( $_POST['nonce'], 'if-entry-nonce' ) ) {
-
-				// bail if we dont have rquired fields
+				
+				// bail if we dont have required fields
 				if ( empty( $title ) || empty( $desc ) ) {
 
 					printf(('<div class="error">%s</div>'), __('Whoopsy! Looks like you forgot the Title and/or description.', 'idea-factory'));
@@ -55,13 +70,15 @@ class ideaFactoryProcessEntry {
 
 					// create an ideas post type
 					$post_args = array(
-					  	'post_title'    => wp_strip_all_tags( $title ),
+					  	'post_title'    => wp_strip_all_tags( $cat .' '. $categoryID .' '. $tmp_category_name .' '. $title),
 					  	'post_content'  => idea_factory_media_filter( $desc ),
 					  	'post_status'   => $must_approve,
 					  	'post_type'	  	=> 'ideas',
-					  	'post_author'   => (int) $userid
+					  	'post_author'   => (int) $userid,
+					  	'post_category' => array($categoryID)
 					);
 					$entry_id = wp_insert_post( $post_args );
+					wp_set_post_categories($entry_id, $categoryID);
 
 					update_post_meta( $entry_id, '_idea_votes', 0 );
 					update_post_meta( $entry_id, '_idea_total_votes', 0 );
