@@ -5,6 +5,14 @@ Idea Factory was born out of necessity, and the frustration of the lack of plugi
 
 [Demo](http://wpideafactory.com/ideas/)
 
+## Setup Multiple Idea Factories
+This fork supports multiple idea factories. It does this by letting you associate each idea factory with an existing Wordpress category. To setup multiple idea factories do as follows:
+
+1. Create unique Wordpress categories for each idea factory instance.
+2. Create a Wordpress page for each instance using the embedded idea factory code, and replace XX with the name of a category: `\[idea_factory hide_submit="off" hide_votes="off" hide_voting="off" idea_category="XX"\]`
+3. Repeat step 2 for each idea factory you need.
+
+I have not tried using multiple categories for a single form, so you are better off sticking to a single category for each idea factory.
 
 ---
 
